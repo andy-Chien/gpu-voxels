@@ -347,6 +347,39 @@ ICMAKER_EXTERNAL_DEPENDENCIES(
 
 ICMAKER_BUILD_PROGRAM()
 
+#------------- Example Program about URDF together with ROS ------------
+
+ICMAKER_SET("ur5_urdf_loader_ros_listener" IDE_FOLDER ${EXAMPLES_IDE_FOLDER})
+
+ICMAKER_ADD_HEADERS(
+  )
+
+ICMAKER_ADD_SOURCES(
+  UR5_URDF_Loader_ROS_listener.cpp
+  )
+
+ICMAKER_ADD_CUDA_FILES(
+  )
+
+ICMAKER_LOCAL_CPPDEFINES(-DGPU_VOXELS_EXPORT_SYMBOLS -Wno-unknown-pragmas)
+ICMAKER_GLOBAL_CPPDEFINES(-D_IC_BUILDER_GPU_VOXELS_EXAMPLES_URDF_LOADER_ROS_)
+ICMAKER_INCLUDE_DIRECTORIES(${GPU_VOXELS_INCLUDE_DIRS})
+
+ICMAKER_INTERNAL_DEPENDENCIES(
+  icl_core
+  icl_core_config
+  icl_core_logging
+  gpu_voxels
+  gpu_voxels_urdf_robot
+  )
+
+ICMAKER_EXTERNAL_DEPENDENCIES(
+  ROS
+  CUDA
+  )
+
+ICMAKER_BUILD_PROGRAM()
+
 #------------- Example Program about ROS TF interfacing ------------
 ICMAKER_SET("tf_interface" IDE_FOLDER ${EXAMPLES_IDE_FOLDER})
 
@@ -386,6 +419,38 @@ ICMAKER_ADD_HEADERS(
 
 ICMAKER_ADD_SOURCES(
   RobotVsEnvironment.cpp
+  )
+
+ICMAKER_ADD_CUDA_FILES(
+  )
+
+ICMAKER_LOCAL_CPPDEFINES(-DGPU_VOXELS_EXPORT_SYMBOLS -Wno-unknown-pragmas)
+ICMAKER_GLOBAL_CPPDEFINES(-D_IC_BUILDER_GPU_VOXELS_EXAMPLES_ROBOT_VS_ENV_)
+ICMAKER_INCLUDE_DIRECTORIES(${GPU_VOXELS_INCLUDE_DIRS})
+
+ICMAKER_INTERNAL_DEPENDENCIES(
+  icl_core
+  icl_core_config
+  icl_core_logging
+  gpu_voxels
+  )
+
+ICMAKER_EXTERNAL_DEPENDENCIES(
+  CUDA
+  OpenNI
+  PCL
+  )
+
+ICMAKER_BUILD_PROGRAM()
+
+#------------- Example Program for the usage of gpu_voxels ------------
+ICMAKER_SET("ur5_vs_environment" IDE_FOLDER ${EXAMPLES_IDE_FOLDER})
+
+ICMAKER_ADD_HEADERS(
+  )
+
+ICMAKER_ADD_SOURCES(
+  UR5VsEnvironment.cpp
   )
 
 ICMAKER_ADD_CUDA_FILES(
