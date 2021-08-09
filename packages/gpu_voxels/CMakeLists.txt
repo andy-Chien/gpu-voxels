@@ -1,3 +1,6 @@
+cmake_minimum_required(VERSION 3.0.2)
+project(gpu_voxels)
+find_package(catkin REQUIRED)
 # this is for emacs file handling -*- mode: cmake; indent-tabs-mode: nil -*-
 
 SET(CMAKE_CXX_STANDARD 11) # comment out to deactivate C++11 when using ROS indigo to avoid incompatibilities
