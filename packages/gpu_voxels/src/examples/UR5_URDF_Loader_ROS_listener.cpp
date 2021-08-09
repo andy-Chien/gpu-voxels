@@ -105,7 +105,7 @@ void callback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& msg)
 
 void jointStateCallback(const sensor_msgs::JointState::ConstPtr& msg)
 {
-  //std::cout << "Got JointStateMessage" << std::endl;
+  // std::cout << "Got JointStateMessage" << std::endl;
   gvl->clearMap("myHandVoxellist");
   gvl->clearMap("myHandVoxellist_2");
 
@@ -181,12 +181,12 @@ int main(int argc, char* argv[])
   // setup "tf" to transform from camera to world / gpu-voxels coordinates
 
   //const Vector3f camera_offsets(2, 0, 1); // camera located at y=0, x_max/2, z_max/2
-  const Vector3f camera_offsets(map_dimensions.x * voxel_side_length * 0.5f, -0.2f, map_dimensions.z * voxel_side_length * 0.5f); // camera located at y=-0.2m, x_max/2, z_max/2
-
+  // const Vector3f camera_offsets(map_dimensions.x * voxel_side_length * 0.5f, -0.2f, map_dimensions.z * voxel_side_length * 0.5f); // camera located at y=-0.2m, x_max/2, z_max/2
+  const Vector3f camera_offsets(-0.3, 0.7, 0.5);
   float roll = icl_core::config::paramOptDefault<float>("roll", 0.0f) * 3.141592f / 180.0f;
-  float pitch = icl_core::config::paramOptDefault<float>("pitch", 0.0f) * 3.141592f / 180.0f;
+  float pitch = icl_core::config::paramOptDefault<float>("pitch", 90.0f) * 3.141592f / 180.0f;
   float yaw = icl_core::config::paramOptDefault<float>("yaw", 0.0f) * 3.141592f / 180.0f;
-  tf = Matrix4f::createFromRotationAndTranslation(Matrix3f::createFromRPY(-3.14/2.0 + roll, 0 + pitch, 0 + yaw), camera_offsets);
+  tf = Matrix4f::createFromRotationAndTranslation(Matrix3f::createFromRPY(roll, pitch, yaw), camera_offsets);
 
   std::string point_cloud_topic = icl_core::config::paramOptDefault<std::string>("points-topic", "/camera/depth/color/points");
   LOGGING_INFO(Gpu_voxels, "DistanceROSDemo start. Point-cloud topic: " << point_cloud_topic << endl);
@@ -245,10 +245,10 @@ int main(int argc, char* argv[])
    * Now we start the main loop, that will read ROS messages and update the Robot.
    */
   // Define two measurement points:
-  std::vector<Vector3i> measurement_points;
-  measurement_points.push_back(Vector3i(40, 100, 50));
-  measurement_points.push_back(Vector3i(160, 100, 50));
-  gvl->modifyPrimitives("measurementPoints", measurement_points, 5);
+  // std::vector<Vector3i> measurement_points;
+  // measurement_points.push_back(Vector3i(40, 100, 50));
+  // measurement_points.push_back(Vector3i(160, 100, 50));
+  // gvl->modifyPrimitives("measurementPoints", measurement_points, 5);
 
   int filter_threshold = icl_core::config::paramOptDefault<int>("filter_threshold", 0);
   std::cout << "Remove voxels containing less points than: " << filter_threshold << std::endl;
@@ -265,11 +265,11 @@ int main(int argc, char* argv[])
   while(ros::ok())
   {
     // std::cout << "=============================================" << std::endl;
-    // ros::Time begin = ros::Time::now();
+    ros::Time begin = ros::Time::now();
     ros::spinOnce();
-    // ros::Time callbackend = ros::Time::now();
-    // std::cout << "callback spend: " << (callbackend - begin).toSec() << std::endl;
-    LOGGING_DEBUG(Gpu_voxels, "START iteration" << endl);
+    
+    
+    // LOGGING_DEBUG(Gpu_voxels, "START iteration" << endl);
 
     // visualize new pointcloud if there is new data
     if (new_data_received) 
@@ -278,62 +278,67 @@ int main(int argc, char* argv[])
       new_data_received = false;
       iteration++;
 
-      pbaDistanceVoxmap->clearMap();
+      // pbaDistanceVoxmap->clearMap();
       countingVoxelList->clearMap();
-      countingVoxelListFiltered->clearMap();
-      erodeTempVoxmap1->clearMap();
-      erodeTempVoxmap2->clearMap();
+      // countingVoxelListFiltered->clearMap();
+      // erodeTempVoxmap1->clearMap();
+      // erodeTempVoxmap2->clearMap();
 
       // Insert the CAMERA data (now in world coordinates) into the list
       countingVoxelList->insertPointCloud(my_point_cloud, eBVM_OCCUPIED);
       gvl->visualizeMap("countingVoxelList");
 
-      countingVoxelListFiltered->merge(countingVoxelList);
-      countingVoxelListFiltered->remove_underpopulated(filter_threshold);
-      gvl->visualizeMap("countingVoxelListFiltered");
+      // countingVoxelListFiltered->merge(countingVoxelList);
+      // countingVoxelListFiltered->remove_underpopulated(filter_threshold);
+      // gvl->visualizeMap("countingVoxelListFiltered");
 
-      LOGGING_INFO(Gpu_voxels, "erode voxels into pbaDistanceVoxmap" << endl);
-      erodeTempVoxmap1->merge(countingVoxelListFiltered);
-      if (erode_threshold > 0)
-      {
-        erodeTempVoxmap1->erodeInto(*erodeTempVoxmap2, erode_threshold);
-      } else
-      {
-        erodeTempVoxmap1->erodeLonelyInto(*erodeTempVoxmap2); //erode only "lonely voxels" without occupied neighbors
-      }
-      pbaDistanceVoxmap->mergeOccupied(erodeTempVoxmap2);
-
+      // LOGGING_INFO(Gpu_voxels, "erode voxels into pbaDistanceVoxmap" << endl);
+      // erodeTempVoxmap1->merge(countingVoxelListFiltered);
+      // if (erode_threshold > 0)
+      // {
+      //   erodeTempVoxmap1->erodeInto(*erodeTempVoxmap2, erode_threshold);
+      // } else
+      // {
+      //   erodeTempVoxmap1->erodeLonelyInto(*erodeTempVoxmap2); //erode only "lonely voxels" without occupied neighbors
+      // }
+      // pbaDistanceVoxmap->mergeOccupied(erodeTempVoxmap2);
+      // gvl->visualizeMap("erodeTempVoxmap2");
       // Calculate the distance map:
-      LOGGING_INFO(Gpu_voxels, "calculate distance map for " << countingVoxelList->getDimensions().x << " occupied voxels" << endl);
-      pbaDistanceVoxmap->parallelBanding3D();
+      // LOGGING_INFO(Gpu_voxels, "calculate distance map for " << countingVoxelList->getDimensions().x << " occupied voxels" << endl);
+      // pbaDistanceVoxmap->parallelBanding3D();
 
-      LOGGING_INFO(Gpu_voxels, "start cloning pbaDistanceVoxmap" << endl);
-      pbaDistanceVoxmapVisual->clone(*(pbaDistanceVoxmap.get()));
-      LOGGING_INFO(Gpu_voxels, "done cloning pbaDistanceVoxmap" << endl);
+      // LOGGING_INFO(Gpu_voxels, "start cloning pbaDistanceVoxmap" << endl);
+      // pbaDistanceVoxmapVisual->clone(*(pbaDistanceVoxmap.get()));
+      // LOGGING_INFO(Gpu_voxels, "done cloning pbaDistanceVoxmap" << endl);
 
-      gvl->visualizeMap("pbaDistanceVoxmapVisual");
-      gvl->visualizePrimitivesArray("measurementPoints");
+      // gvl->visualizeMap("pbaDistanceVoxmapVisual");
+      // gvl->visualizePrimitivesArray("measurementPoints");
 
       // For the measurement points we query the clearance to the closest obstacle:
-      thrust::device_ptr<DistanceVoxel> dvm_thrust_ptr(pbaDistanceVoxmap->getDeviceDataPtr());
-      for(size_t i = 0; i < measurement_points.size(); i++)
-      {
-        int id = voxelmap::getVoxelIndexSigned(map_dimensions, measurement_points[i]);
+      // thrust::device_ptr<DistanceVoxel> dvm_thrust_ptr(pbaDistanceVoxmap->getDeviceDataPtr());
+      // for(size_t i = 0; i < measurement_points.size(); i++)
+      // {
+      //   int id = voxelmap::getVoxelIndexSigned(map_dimensions, measurement_points[i]);
 
-        //get DistanceVoxel with closest obstacle information
-        // DistanceVoxel dv = dvm_thrust_ptr[id]; // worked before Cuda9
-        DistanceVoxel dv; //get DistanceVoxel with closest obstacle information
-        cudaMemcpy(&dv, (dvm_thrust_ptr+id).get(), sizeof(DistanceVoxel), cudaMemcpyDeviceToHost);
+      //   //get DistanceVoxel with closest obstacle information
+      //   // DistanceVoxel dv = dvm_thrust_ptr[id]; // worked before Cuda9
+      //   DistanceVoxel dv; //get DistanceVoxel with closest obstacle information
+      //   cudaMemcpy(&dv, (dvm_thrust_ptr+id).get(), sizeof(DistanceVoxel), cudaMemcpyDeviceToHost);
 
-        float metric_free_space = sqrtf(dv.squaredObstacleDistance(measurement_points[i])) * voxel_side_length;
-        LOGGING_INFO(Gpu_voxels, "Obstacle @ " << dv.getObstacle() << " Voxel @ " << measurement_points[i] << " has a clearance of " << metric_free_space << "m." << endl);
-      }
+      //   float metric_free_space = sqrtf(dv.squaredObstacleDistance(measurement_points[i])) * voxel_side_length;
+      //   LOGGING_INFO(Gpu_voxels, "Obstacle @ " << dv.getObstacle() << " Voxel @ " << measurement_points[i] << " has a clearance of " << metric_free_space << "m." << endl);
+      // }
     }
+    ros::Time callbackend = ros::Time::now();
+    std::cout << "callback spend: " << (callbackend - begin).toSec() << std::endl;
 
-    num_colls = gvl->getMap("myHandVoxellist")->as<voxellist::BitVectorVoxelList>()->collideWithTypes(gvl->getMap("myObjectVoxelmap")->as<voxelmap::ProbVoxelMap>(), bits_in_collision);
-    num_colls += gvl->getMap("myHandVoxellist")->as<voxellist::BitVectorVoxelList>()->collideWithTypes(gvl->getMap("myHandVoxellist_2")->as<voxellist::BitVectorVoxelList>(), bits_in_collision);
-    num_colls += gvl->getMap("myHandVoxellist_2")->as<voxellist::BitVectorVoxelList>()->collideWithTypes(gvl->getMap("myObjectVoxelmap")->as<voxelmap::ProbVoxelMap>(), bits_in_collision);
-    // ros::Time mid = ros::Time::now();
+    // num_colls = gvl->getMap("myHandVoxellist")->as<voxellist::BitVectorVoxelList>()->collideWithTypes(gvl->getMap("myObjectVoxelmap")->as<voxelmap::ProbVoxelMap>(), bits_in_collision);
+    num_colls = gvl->getMap("myHandVoxellist")->as<voxellist::BitVectorVoxelList>()->collideWithTypes(gvl->getMap("myHandVoxellist_2")->as<voxellist::BitVectorVoxelList>(), bits_in_collision);
+    // num_colls += gvl->getMap("myHandVoxellist_2")->as<voxellist::BitVectorVoxelList>()->collideWithTypes(gvl->getMap("myObjectVoxelmap")->as<voxelmap::ProbVoxelMap>(), bits_in_collision);
+    num_colls += gvl->getMap("myHandVoxellist")->as<voxellist::BitVectorVoxelList>()->collideWithTypes(gvl->getMap("countingVoxelList")->as<voxellist::BitVectorVoxelList>(), bits_in_collision);
+    num_colls += gvl->getMap("myHandVoxellist_2")->as<voxellist::BitVectorVoxelList>()->collideWithTypes(gvl->getMap("countingVoxelList")->as<voxellist::BitVectorVoxelList>(), bits_in_collision);
+    ros::Time mid = ros::Time::now();
+    std::cout << "check collision spend: " << (mid - callbackend).toSec() << std::endl;
     if(num_colls > 0)
       std::cout << "Detected " << num_colls << " collisions" << std::endl;
     //std::cout << "with bits \n" << bits_in_collision << std::endl;
@@ -341,8 +346,9 @@ int main(int argc, char* argv[])
     gvl->visualizeMap("myHandVoxellist");
     gvl->visualizeMap("myHandVoxellist_2");
     gvl->visualizeMap("myObjectVoxelmap");
-    // ros::Time end = ros::Time::now();
-    // std::cout << "total spend: " << (end - begin).toSec() << std::endl;
+    ros::Time end = ros::Time::now();
+    std::cout << "visual spend: " << (end - mid).toSec() << std::endl;
+    std::cout << "total spend: " << (end - begin).toSec() << std::endl;
 
     // usleep(30000);
   }
