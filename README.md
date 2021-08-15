@@ -16,11 +16,16 @@ at https://github.com/fzi-forschungszentrum-informatik/gpu-voxels/issues
 This software is tested under 64 Bit Ubuntu Linux 14.04, 16.04 and 18.04.
 Find detailed installation and linking instructions in our Doxygen.
 
-use CUDA 10.2
-sudo apt install libglm-dev
+## when use CUDA 10.2:
 in FindEigen3.cmake file
 set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} "path/to/eigen3.3")
-export GPU_VOXELS_MODEL_PATH=/home/andy/gpu_voxels/src/packages/gpu_voxels/models/
+
+## export the models:
+export GPU_VOXELS_MODEL_PATH={path/to/gpu-voxels}/packages/gpu_voxels/models/
+
+## evaluation:
+4ms in 200 x 200 x 200 environment with 3060
+
 **Core:**
 
 - CUDA 7.5, 8.0, 9.x or 10.0
