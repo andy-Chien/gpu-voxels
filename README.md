@@ -19,7 +19,7 @@ Find detailed installation and linking instructions in our Doxygen.
 use CUDA 10.2
 sudo apt install libglm-dev
 in FindEigen3.cmake file
-set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} "/home/andy/eigen3.3/eigen")
+set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} "path/to/eigen3.3")
 export GPU_VOXELS_MODEL_PATH=/home/andy/gpu_voxels/src/packages/gpu_voxels/models/
 **Core:**
 

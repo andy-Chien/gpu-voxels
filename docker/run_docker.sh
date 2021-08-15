@@ -13,7 +13,7 @@ fi
 # a different directory
 HOST_DIR=$2
 if [[ -z "${HOST_DIR}" ]]; then
-    HOST_DIR=`realpath ${PWD}/..`
+    HOST_DIR=`realpath ${PWD}/../..`
 fi
 
 CONTAINER_DIR=$3
