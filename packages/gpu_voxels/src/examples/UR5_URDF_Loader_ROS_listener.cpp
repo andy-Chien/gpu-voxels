@@ -333,10 +333,11 @@ int main(int argc, char* argv[])
     std::cout << "callback spend: " << (callbackend - begin).toSec() << std::endl;
 
     // num_colls = gvl->getMap("myHandVoxellist")->as<voxellist::BitVectorVoxelList>()->collideWithTypes(gvl->getMap("myObjectVoxelmap")->as<voxelmap::ProbVoxelMap>(), bits_in_collision);
-    num_colls = gvl->getMap("myHandVoxellist")->as<voxellist::BitVectorVoxelList>()->collideWithTypes(gvl->getMap("myHandVoxellist_2")->as<voxellist::BitVectorVoxelList>(), bits_in_collision);
+    num_colls = gvl->getMap("myHandVoxellist")->as<voxelmap::BitVectorVoxelMap>()->collideWithTypes(gvl->getMap("myHandVoxellist_2")->as<voxelmap::BitVectorVoxelMap>(), bits_in_collision);
     // num_colls += gvl->getMap("myHandVoxellist_2")->as<voxellist::BitVectorVoxelList>()->collideWithTypes(gvl->getMap("myObjectVoxelmap")->as<voxelmap::ProbVoxelMap>(), bits_in_collision);
-    num_colls += gvl->getMap("myHandVoxellist")->as<voxellist::BitVectorVoxelList>()->collideWithTypes(gvl->getMap("countingVoxelList")->as<voxellist::BitVectorVoxelList>(), bits_in_collision);
-    num_colls += gvl->getMap("myHandVoxellist_2")->as<voxellist::BitVectorVoxelList>()->collideWithTypes(gvl->getMap("countingVoxelList")->as<voxellist::BitVectorVoxelList>(), bits_in_collision);
+    num_colls += gvl->getMap("myHandVoxellist")->as<voxelmap::BitVectorVoxelMap>()->collideWithTypes(gvl->getMap("countingVoxelList")->as<voxelmap::BitVectorVoxelMap>(), bits_in_collision);
+    num_colls += gvl->getMap("myHandVoxellist_2")->as<voxelmap::BitVectorVoxelMap>()->collideWithTypes(gvl->getMap("countingVoxelList")->as<voxelmap::BitVectorVoxelMap>(), bits_in_collision);
+    // bool colls = gvl->getMap("myHandVoxellist_2")->as<voxelmap::BitVectorVoxelMap>()->collisionCheck(gvl->getMap("countingVoxelList")->as<voxelmap::BitVoxelMap>(), default_collider);
     ros::Time mid = ros::Time::now();
     std::cout << "check collision spend: " << (mid - callbackend).toSec() << std::endl;
     if(num_colls > 0)
