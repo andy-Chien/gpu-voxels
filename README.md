@@ -67,7 +67,9 @@ export GPU_VOXELS_MODEL_PATH={path/to/gpu-voxels}/packages/gpu_voxels/models/
         ./gpu_voxels_visualizer
 
 ## evaluation:
-4ms in 200 x 200 x 200 environment with 3060
+4ms in 200 x 200 x 200 environment with 3060 when used voxel-list
+0.2ms in 200 x 200 x 200 environment with 1070 when used voxel-map
+0.15ms in 200 x 200 x 200 environment with 3060 when used voxel-map
 
 ## Compiling without C++11
 C++11 is enabled by default. To compile without C++11 mode comment out this at the top of packages/gpu_voxels/CMakeLists.txt: 

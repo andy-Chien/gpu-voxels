@@ -55,10 +55,12 @@ namespace bfs = boost::filesystem;
 shared_ptr<GpuVoxels> gvl;
 
 
-Vector3ui map_dimensions(256, 256, 256);
+Vector3ui map_dimensions(200, 200, 200);
 float voxel_side_length = 0.01f; // 1 cm voxel size
 
 bool new_data_received;
+bool show_time = false;
+
 PointCloud my_point_cloud;
 Matrix4f tf;
 
@@ -82,6 +84,7 @@ Vector3f object_position(0.4, 0.15, 0.4);
  */
 void callback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& msg)
 {
+  show_time = true;
   std::vector<Vector3f> point_data;
   point_data.resize(msg->points.size());
 
@@ -270,7 +273,7 @@ int main(int argc, char* argv[])
     // std::cout << "=============================================" << std::endl;
     ros::Time begin = ros::Time::now();
     ros::spinOnce();
-    
+    ros::Time callbackend = ros::Time::now();
     
     // LOGGING_DEBUG(Gpu_voxels, "START iteration" << endl);
 
@@ -332,8 +335,7 @@ int main(int argc, char* argv[])
       //   LOGGING_INFO(Gpu_voxels, "Obstacle @ " << dv.getObstacle() << " Voxel @ " << measurement_points[i] << " has a clearance of " << metric_free_space << "m." << endl);
       // }
     }
-    ros::Time callbackend = ros::Time::now();
-    std::cout << "callback spend: " << (callbackend - begin).toSec() << std::endl;
+    ros::Time handle_pointcloud = ros::Time::now();
 
     // num_colls = gvl->getMap("myHandVoxellist")->as<voxellist::BitVectorVoxelList>()->collideWithTypes(gvl->getMap("myObjectVoxelmap")->as<voxelmap::ProbVoxelMap>(), bits_in_collision);
     num_colls = gvl->getMap("myHandVoxellist")->as<voxelmap::BitVectorVoxelMap>()->collideWithTypes(gvl->getMap("myHandVoxellist_2")->as<voxelmap::BitVectorVoxelMap>(), bits_in_collision);
@@ -342,17 +344,24 @@ int main(int argc, char* argv[])
     num_colls += gvl->getMap("myHandVoxellist_2")->as<voxelmap::BitVectorVoxelMap>()->collideWithTypes(gvl->getMap("countingVoxelList")->as<voxelmap::BitVectorVoxelMap>(), bits_in_collision);
     // bool colls = gvl->getMap("myHandVoxellist_2")->as<voxelmap::BitVectorVoxelMap>()->collisionCheck(gvl->getMap("countingVoxelList")->as<voxelmap::BitVoxelMap>(), default_collider);
     ros::Time mid = ros::Time::now();
-    std::cout << "check collision spend: " << (mid - callbackend).toSec() << std::endl;
-    if(num_colls > 0)
-      std::cout << "Detected " << num_colls << " collisions" << std::endl;
+    
     //std::cout << "with bits \n" << bits_in_collision << std::endl;
     // tell the visualier that the map has changed:
     gvl->visualizeMap("myHandVoxellist");
     gvl->visualizeMap("myHandVoxellist_2");
     gvl->visualizeMap("myObjectVoxelmap");
-    ros::Time end = ros::Time::now();
-    std::cout << "visual spend: " << (end - mid).toSec() << std::endl;
-    std::cout << "total spend: " << (end - begin).toSec() << std::endl;
+    if(show_time)
+    {
+      show_time = false;
+      std::cout << "callback spend: " << (callbackend - begin).toSec() << std::endl;
+      std::cout<< "handle_pointcloud: " << (handle_pointcloud - begin).toSec() << std::endl;
+      std::cout << "check collision spend: " << (mid - callbackend).toSec() << std::endl;
+      ros::Time end = ros::Time::now();
+      if(num_colls > 0)
+        std::cout << "Detected " << num_colls << " collisions" << std::endl;
+      std::cout << "visual spend: " << (end - mid).toSec() << std::endl;
+      std::cout << "total spend: " << (end - begin).toSec() << std::endl;
+    }
 
     // usleep(30000);
   }
