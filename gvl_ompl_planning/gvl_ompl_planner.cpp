@@ -36,6 +36,7 @@ using namespace std;
 #include <stdlib.h>
 
 #include <memory>
+#include <time.h>
 
 namespace ob = ompl::base;
 namespace og = ompl::geometric;
@@ -111,6 +112,9 @@ int main(int argc, char **argv)
     std::cout << "Waiting for Viz. Press Key if ready!" << std::endl;
     std::cin.ignore();
 
+    clock_t start_t, end_t;
+    double total_t;
+
     for(size_t n = 0; n < 5; ++n)
     {
         my_class_ptr->moveObstacle();
@@ -118,7 +122,13 @@ int main(int argc, char **argv)
         //We can now try to solve the problem. This call returns a value from ompl::base::PlannerStatus which describes whether a solution has been found within the specified amount of time (in seconds). If this value can be cast to true, a solution was found.
         PERF_MON_START("planner");
         planner->clear(); // this clears all roadmaps
+        start_t = clock();
         ob::PlannerStatus solved = planner->ob::Planner::solve(20.0);
+        end_t = clock();
+        total_t = (double)(end_t - start_t) / CLOCKS_PER_SEC;
+        std::cout<<"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<<std::endl;
+        std::cout<<"ompl planning time: " <<total_t<<std::endl;
+        std::cout<<"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<<std::endl;
         PERF_MON_SILENT_MEASURE_AND_RESET_INFO_P("planner", "Planning time", "planning");
 
         //If a solution has been found, we simplify and display it.

@@ -105,6 +105,7 @@ void callback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& msg)
 
 void jointStateCallback(const sensor_msgs::JointState::ConstPtr& msg)
 {
+  ros::Time start = ros::Time::now();
   // std::cout << "Got JointStateMessage" << std::endl;
   gvl->clearMap("myHandVoxellist");
   gvl->clearMap("myHandVoxellist_2");
@@ -121,6 +122,8 @@ void jointStateCallback(const sensor_msgs::JointState::ConstPtr& msg)
   gvl->setRobotConfiguration("myUrdfRobot2", myRobotJointValues);
   // insert the robot into the map:
   gvl->insertRobotIntoMap("myUrdfRobot2", "myHandVoxellist_2", eBVM_OCCUPIED);
+  ros::Time end = ros::Time::now();
+  std::cout<<"jointStateCallback spend "<<(end - start).toSec() << " s" << std::endl;
 }
 
 void obstaclePoseCallback(const geometry_msgs::Pose::ConstPtr& msg)
