@@ -108,6 +108,7 @@ void callback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& msg)
 
 void jointStateCallback(const sensor_msgs::JointState::ConstPtr& msg)
 {
+  show_time = true;
   ros::Time start = ros::Time::now();
   // std::cout << "Got JointStateMessage" << std::endl;
   gvl->clearMap("myHandVoxellist");
@@ -117,16 +118,20 @@ void jointStateCallback(const sensor_msgs::JointState::ConstPtr& msg)
   {
     myRobotJointValues[msg->name[i]] = msg->position[i];
   }
-  // update the robot joints:
+  ros::Time set_start = ros::Time::now();
+  // update the robot joints: spend 0.16 ms
   gvl->setRobotConfiguration("myUrdfRobot", myRobotJointValues);
-  // insert the robot into the map:
+  ros::Time insert_start = ros::Time::now();
+  // insert the robot into the map:  spend 3.5 ms
   gvl->insertRobotIntoMap("myUrdfRobot", "myHandVoxellist", eBVM_OCCUPIED);
+  ros::Time insert_end = ros::Time::now();
   // update the robot joints:
   gvl->setRobotConfiguration("myUrdfRobot2", myRobotJointValues);
   // insert the robot into the map:
   gvl->insertRobotIntoMap("myUrdfRobot2", "myHandVoxellist_2", eBVM_OCCUPIED);
   ros::Time end = ros::Time::now();
-  std::cout<<"jointStateCallback spend "<<(end - start).toSec() << " s" << std::endl;
+  std::cout<<"jointStateCallback spend "<<(end - start).toSec() * 1000<< " ms, set config " << 
+   (insert_start - set_start).toSec() * 1000 << " ms, insert " << (insert_end - insert_start).toSec() * 1000 <<" ms"<<std::endl;
 }
 
 void obstaclePoseCallback(const geometry_msgs::Pose::ConstPtr& msg)
@@ -205,8 +210,10 @@ int main(int argc, char* argv[])
 
   // Add a map:
   gvl->addMap(MT_PROBAB_VOXELMAP, "myObjectVoxelmap");
-  gvl->addMap(MT_BITVECTOR_VOXELLIST, "myHandVoxellist");
-  gvl->addMap(MT_BITVECTOR_VOXELLIST, "myHandVoxellist_2");
+  // gvl->addMap(MT_BITVECTOR_VOXELLIST, "myHandVoxellist");
+  // gvl->addMap(MT_BITVECTOR_VOXELLIST, "myHandVoxellist_2");
+  gvl->addMap(MT_PROBAB_VOXELMAP, "myHandVoxellist");
+  gvl->addMap(MT_PROBAB_VOXELMAP, "myHandVoxellist_2");
 
   gvl->addMap(MT_DISTANCE_VOXELMAP, "pbaDistanceVoxmap");
   shared_ptr<DistanceVoxelMap> pbaDistanceVoxmap = dynamic_pointer_cast<DistanceVoxelMap>(gvl->getMap("pbaDistanceVoxmap"));
@@ -336,12 +343,12 @@ int main(int argc, char* argv[])
       // }
     }
     ros::Time handle_pointcloud = ros::Time::now();
-
+    //size_t collideWith(const voxelmap::ProbVoxelMap* map, float coll_threshold = 1.0, const Vector3i &offset = Vector3i());
     // num_colls = gvl->getMap("myHandVoxellist")->as<voxellist::BitVectorVoxelList>()->collideWithTypes(gvl->getMap("myObjectVoxelmap")->as<voxelmap::ProbVoxelMap>(), bits_in_collision);
-    num_colls = gvl->getMap("myHandVoxellist")->as<voxelmap::BitVectorVoxelMap>()->collideWithTypes(gvl->getMap("myHandVoxellist_2")->as<voxelmap::BitVectorVoxelMap>(), bits_in_collision);
+    num_colls = gvl->getMap("myHandVoxellist")->as<voxelmap::ProbVoxelMap>()->collideWith(gvl->getMap("myHandVoxellist_2")->as<voxelmap::ProbVoxelMap>(), 0.2);//, bits_in_collision);
     // num_colls += gvl->getMap("myHandVoxellist_2")->as<voxellist::BitVectorVoxelList>()->collideWithTypes(gvl->getMap("myObjectVoxelmap")->as<voxelmap::ProbVoxelMap>(), bits_in_collision);
-    num_colls += gvl->getMap("myHandVoxellist")->as<voxelmap::BitVectorVoxelMap>()->collideWithTypes(gvl->getMap("countingVoxelList")->as<voxelmap::BitVectorVoxelMap>(), bits_in_collision);
-    num_colls += gvl->getMap("myHandVoxellist_2")->as<voxelmap::BitVectorVoxelMap>()->collideWithTypes(gvl->getMap("countingVoxelList")->as<voxelmap::BitVectorVoxelMap>(), bits_in_collision);
+    // num_colls += gvl->getMap("myHandVoxellist")->as<voxelmap::BitVectorVoxelMap>()->collideWithTypes(gvl->getMap("countingVoxelList")->as<voxelmap::BitVectorVoxelMap>(), bits_in_collision);
+    // num_colls += gvl->getMap("myHandVoxellist_2")->as<voxelmap::BitVectorVoxelMap>()->collideWithTypes(gvl->getMap("countingVoxelList")->as<voxelmap::BitVectorVoxelMap>(), bits_in_collision);
     // bool colls = gvl->getMap("myHandVoxellist_2")->as<voxelmap::BitVectorVoxelMap>()->collisionCheck(gvl->getMap("countingVoxelList")->as<voxelmap::BitVoxelMap>(), default_collider);
     ros::Time mid = ros::Time::now();
     
@@ -353,14 +360,14 @@ int main(int argc, char* argv[])
     if(show_time)
     {
       show_time = false;
-      std::cout << "callback spend: " << (callbackend - begin).toSec() << std::endl;
-      std::cout<< "handle_pointcloud: " << (handle_pointcloud - begin).toSec() << std::endl;
-      std::cout << "check collision spend: " << (mid - callbackend).toSec() << std::endl;
-      ros::Time end = ros::Time::now();
+      // std::cout << "callback spend: " << (callbackend - begin).toSec() << std::endl;
+      // std::cout<< "handle_pointcloud: " << (handle_pointcloud - begin).toSec() << std::endl;
+      std::cout << "check collision spend: " << (mid - handle_pointcloud).toSec() * 1000 <<" ms"<< std::endl;
+      // ros::Time end = ros::Time::now();
       if(num_colls > 0)
-        std::cout << "Detected " << num_colls << " collisions" << std::endl;
-      std::cout << "visual spend: " << (end - mid).toSec() << std::endl;
-      std::cout << "total spend: " << (end - begin).toSec() << std::endl;
+        std::cout << "Detected " << num_colls << " collisions !!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+      // std::cout << "visual spend: " << (end - mid).toSec() << std::endl;
+      // std::cout << "total spend: " << (end - begin).toSec() << std::endl;
     }
 
     // usleep(30000);

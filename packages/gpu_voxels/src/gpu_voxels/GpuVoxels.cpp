@@ -377,7 +377,7 @@ bool GpuVoxels::addRobot(const std::string &robot_name, const std::string &path_
     LOGGING_ERROR_C(Gpu_voxels, GpuVoxels, "Robot with name '" << robot_name << "' already exists." << endl);
     return false;
   }
-
+  LOGGING_ERROR_C(Gpu_voxels, GpuVoxels, "URDF Robot with name '" << robot_name << "' already insert." << endl);
   m_managed_robots.insert(
       std::pair<std::string, RobotInterfaceSharedPtr>(
           robot_name, RobotInterfaceSharedPtr(new robot::UrdfRobot(m_voxel_side_length, path_to_urdf_file, use_model_path))));

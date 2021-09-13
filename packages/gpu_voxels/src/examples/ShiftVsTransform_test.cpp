@@ -33,6 +33,7 @@
 #include <signal.h>
 #include <time.h>
 
+
 #include <gpu_voxels/GpuVoxels.h>
 #include <gpu_voxels/helpers/MetaPointCloud.h>
 #include <gpu_voxels/helpers/PointcloudFileHandler.h>
@@ -78,58 +79,58 @@ int main(int argc, char* argv[])
 
   // load Voxellist
   gvl->insertPointCloudFromFile("myObjectVoxellist", "/schunk_svh/f20.binvox", true,
-                                eBVM_OCCUPIED, true, Vector3f(0.06, 0.05, 0.01), 1.0);
+                                eBVM_OCCUPIED, false, Vector3f(0.06, 0.05, 0.01), 1.0);
   std::cout << "List generated" << std::endl;
 
 
   // load Metapointcloud to put into Voxelmap
   std::vector<Vector3f> pc;
   file_handling::PointcloudFileHandler::Instance()->loadPointCloud(
-           "/ur5_50/base.binvox", true, pc, true, Vector3f(0.1, 0.5, 0.01), 1.0);
+           "/ur5_50/base.binvox", true, pc, false, Vector3f(0.1, 0.5, 0.01), 1.0);
   std::cout << "Num points: " << pc.size() << std::endl;
   std::vector< std::vector<Vector3f> > vpc;
   vpc.push_back(pc);
-  MetaPointCloud mpc(vpc);
+  // MetaPointCloud mpc(vpc);
 
   std::vector<Vector3f> pc1;
   file_handling::PointcloudFileHandler::Instance()->loadPointCloud(
-           "/ur5_50/upperarm.binvox", true, pc1, true, Vector3f(0.2, 0.4, 0.11), 1.0);
+           "/ur5_50/upperarm.binvox", true, pc1, false, Vector3f(0.2, 0.4, 0.11), 1.0);
   std::cout << "Num points: " << pc1.size() << std::endl;
   std::vector< std::vector<Vector3f> > vpc1;
-  vpc1.push_back(pc1);
-  MetaPointCloud mpc1(vpc1);
+  vpc.push_back(pc1);
+  // MetaPointCloud mpc1(vpc1);
 
   std::vector<Vector3f> pc2;
   file_handling::PointcloudFileHandler::Instance()->loadPointCloud(
-           "/ur5_50/forearm.binvox", true, pc2, true, Vector3f(0.3, 0.3, 0.2), 1.0);
+           "/ur5_50/forearm.binvox", true, pc2, false, Vector3f(0.3, 0.3, 0.2), 1.0);
   std::cout << "Num points: " << pc2.size() << std::endl;
   std::vector< std::vector<Vector3f> > vpc2;
-  vpc2.push_back(pc2);
-  MetaPointCloud mpc2(vpc2);
+  vpc.push_back(pc2);
+  // MetaPointCloud mpc2(vpc2);
 
   std::vector<Vector3f> pc3;
   file_handling::PointcloudFileHandler::Instance()->loadPointCloud(
-           "/ur5_50/shoulder.binvox", true, pc3, true, Vector3f(0.4, 0.6, 0.2), 1.0);
+           "/ur5_50/shoulder.binvox", true, pc3, false, Vector3f(0.4, 0.6, 0.2), 1.0);
   std::cout << "Num points: " << pc3.size() << std::endl;
   std::vector< std::vector<Vector3f> > vpc3;
-  vpc3.push_back(pc3);
-  MetaPointCloud mpc3(vpc3);
+  vpc.push_back(pc3);
+  // MetaPointCloud mpc3(vpc3);
 
   std::vector<Vector3f> pc4;
   file_handling::PointcloudFileHandler::Instance()->loadPointCloud(
-           "/ur5_50/wrist1.binvox", true, pc4, true, Vector3f(0.5, 0.5, 0.3), 1.0);
+           "/ur5_50/wrist1.binvox", true, pc4, false, Vector3f(0.5, 0.5, 0.3), 1.0);
   std::cout << "Num points: " << pc4.size() << std::endl;
   std::vector< std::vector<Vector3f> > vpc4;
-  vpc4.push_back(pc4);
-  MetaPointCloud mpc4(vpc4);
+  vpc.push_back(pc4);
+  // MetaPointCloud mpc4(vpc4);
 
   std::vector<Vector3f> pc5;
   file_handling::PointcloudFileHandler::Instance()->loadPointCloud(
-           "/ur5_50/wrist2.binvox", true, pc5, true, Vector3f(0.6, 0.4, 0.2), 1.0);
+           "/ur5_50/wrist2.binvox", true, pc5, false, Vector3f(0.6, 0.4, 0.2), 1.0);
   std::cout << "Num points: " << pc5.size() << std::endl;
   std::vector< std::vector<Vector3f> > vpc5;
-  vpc5.push_back(pc5);
-  MetaPointCloud mpc5(vpc5);
+  vpc.push_back(pc5);
+  MetaPointCloud mpc(vpc);
 
 
 
@@ -153,19 +154,24 @@ int main(int argc, char* argv[])
   gvl->getMap("myObjectVoxelmap5")->clearMap();
   gvl->getMap("myObjectVoxelmap6")->clearMap();
   clock_o_begin_1 = clock();
-  mpc.transformSelf(&trans);
-  mpc1.transformSelf(&trans);
-  mpc2.transformSelf(&trans);
-  mpc3.transformSelf(&trans);
-  mpc4.transformSelf(&trans);
-  mpc5.transformSelf(&trans);
+  mpc.transformSelfSubCloud(0, &trans);
+  mpc.transformSelfSubCloud(1, &trans);
+  mpc.transformSelfSubCloud(2, &trans);
+  mpc.transformSelfSubCloud(3, &trans);
+  mpc.transformSelfSubCloud(4, &trans);
+  mpc.transformSelfSubCloud(5, &trans);
+  // mpc1.transformSelf(&trans);
+  // mpc2.transformSelf(&trans);
+  // mpc3.transformSelf(&trans);
+  // mpc4.transformSelf(&trans);
+  // mpc5.transformSelf(&trans);
   clock_o_begin_2 = clock();
   gvl->getMap("myObjectVoxelmap6")->insertMetaPointCloud(mpc, eBVM_SWEPT_VOLUME_START);
-  gvl->getMap("myObjectVoxelmap6")->insertMetaPointCloud(mpc1, eBVM_SWEPT_VOLUME_START);
-  gvl->getMap("myObjectVoxelmap6")->insertMetaPointCloud(mpc2, eBVM_SWEPT_VOLUME_START);
-  gvl->getMap("myObjectVoxelmap6")->insertMetaPointCloud(mpc3, eBVM_SWEPT_VOLUME_START);
-  gvl->getMap("myObjectVoxelmap6")->insertMetaPointCloud(mpc4, eBVM_SWEPT_VOLUME_START);
-  gvl->getMap("myObjectVoxelmap6")->insertMetaPointCloud(mpc5, eBVM_SWEPT_VOLUME_START);
+  // gvl->getMap("myObjectVoxelmap6")->insertMetaPointCloud(mpc1, eBVM_SWEPT_VOLUME_START);
+  // gvl->getMap("myObjectVoxelmap6")->insertMetaPointCloud(mpc2, eBVM_SWEPT_VOLUME_START);
+  // gvl->getMap("myObjectVoxelmap6")->insertMetaPointCloud(mpc3, eBVM_SWEPT_VOLUME_START);
+  // gvl->getMap("myObjectVoxelmap6")->insertMetaPointCloud(mpc4, eBVM_SWEPT_VOLUME_START);
+  // gvl->getMap("myObjectVoxelmap6")->insertMetaPointCloud(mpc5, eBVM_SWEPT_VOLUME_START);
   clock_o_begin_3 = clock();
   colls = gvl->getMap("myObjectVoxellist")->as<voxellist::BitVectorVoxelList>()->collideWith(gvl->getMap("myObjectVoxelmap")->as<voxelmap::ProbVoxelMap>(), 0.1);
   clock_o_begin_4 = clock();
