@@ -193,13 +193,13 @@ REMOVE_VTK_DEFINITIONS()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_FORCE_INLINES")
 
 ADD_SUBDIRECTORY(src/gpu_voxels)
-ADD_SUBDIRECTORY(src/gpu_visualization)
+# ADD_SUBDIRECTORY(src/gpu_visualization)
 
 ICMAKER_CONFIGURE_PACKAGE()
 
 ###############################################################################
 # Build examples
-ADD_SUBDIRECTORY(src/examples)
+# ADD_SUBDIRECTORY(src/examples)
 
 IF(BUILD_TESTS)
 ENDIF(BUILD_TESTS)

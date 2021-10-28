@@ -52,7 +52,7 @@
 
 include(PrintLibraryStatus)
 include(LibFindMacros)
-
+set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} "/usr/include/eigen3.3/eigen")
 libfind_lib_with_pkg_config(Eigen3 eigen3
   HEADERS Eigen/Core
   HEADER_PATHS "${CMAKE_PREFIX_PATH}" "/usr/include/eigen3" "${CMAKE_INSTALL_PREFIX}/include/eigen3"
