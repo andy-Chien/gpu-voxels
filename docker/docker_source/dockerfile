@@ -1,0 +1,51 @@
+FROM nvidia/cudagl:11.1.1-devel-ubuntu20.04
+# Copyright (c) 2020, NVIDIA CORPORATION. All rights reserved.
+# Full license terms provided in LICENSE.md file.
+# To build:
+# docker build -t nvidia-dope:noetic-v1 -f Dockerfile.noetic ..
+ENV USER solomon
+ENV HOME /home/${USER}
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN useradd -m $USER && echo "$USER:solo" | chpasswd && adduser $USER sudo
+
+RUN echo 'Acquire::http::Pipeline-Depth 0;' > /etc/apt/apt.conf.d/fixbadproxy
+RUN echo 'Acquire::http::No-Cache "true";' >> /etc/apt/apt.conf.d/fixbadproxy
+RUN echo 'Acquire::BrokenProxy "true";' >> /etc/apt/apt.conf.d/fixbadproxy
+# RUN sed -i s:/archive.ubuntu.com:/free.nchc.org.tw:g /etc/apt/sources.list
+
+# Change the sources to NCHC, Taiwan (20 Gbps), aarch64 has other sources
+RUN sed -i'' 's/archive\.ubuntu\.com/free\.nchc\.org\.tw/' /etc/apt/sources.list
+RUN sed -i'' 's/security\.ubuntu\.com/free\.nchc\.org\.tw/' /etc/apt/sources.list
+
+
+RUN apt-get -y update
+RUN apt-get install -y apt-utils \
+                       lsb-release \
+                       curl \
+                       build-essential \
+                       sudo \
+                       libglm-dev \
+                       libglew-dev
+# install ros
+RUN sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+RUN curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | apt-key add -
+RUN apt-get -y update
+RUN apt-get install -y ros-noetic-ros-base
+RUN echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
+# RUN apt-get install -y ros-noetic-moveit \
+#                        ros-noetic-joint-state-controller \
+#                        ros-noetic-joint-state-publisher \
+#                        ros-noetic-joint-trajectory-controller \
+#                        ros-noetic-position-controllers \
+#                        ros-noetic-velocity-controllers \
+#                        ros-noetic-effort-controllers \
+#                        ros-noetic-pcl-ros \
+#                        ros-noetic-tf-conversions \
+#                        ros-noetic-camera-info-manager
+
+# Setup catkin workspace
+ENV CATKIN_WS ${HOME}/catkin_ws
+COPY . ${CATKIN_WS}/src/
+
+ENV TERM=xterm
