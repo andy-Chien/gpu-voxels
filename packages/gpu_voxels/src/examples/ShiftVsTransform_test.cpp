@@ -74,6 +74,7 @@ int main(int argc, char* argv[])
   gvl->addMap(MT_PROBAB_VOXELMAP, "myObjectVoxelmap5");
   gvl->addMap(MT_PROBAB_VOXELMAP, "myObjectVoxelmap6");
   gvl->addMap(MT_BITVECTOR_VOXELLIST, "myObjectVoxellist");
+  gvl->addMap(MT_BITVECTOR_VOXELLIST, "robotList");
 
 
 
@@ -129,6 +130,10 @@ int main(int argc, char* argv[])
            "/ur5_50/wrist2.binvox", true, pc5, false, Vector3f(0.6, 0.4, 0.2), 1.0);
   std::cout << "Num points: " << pc5.size() << std::endl;
   std::vector< std::vector<Vector3f> > vpc5;
+  // std::cout<<"================================================================================="<<std::endl;
+  // for(int i=0; i<pc5.size(); i++)
+  //   std::cout<<pc5[i].x<<", "<<pc5[i].y<<", "<<pc5[i].z<<", ";
+  // std::cout<<std::endl<<"================================================================================="<<std::endl;
   vpc.push_back(pc5);
   MetaPointCloud mpc(vpc);
 
@@ -153,6 +158,7 @@ int main(int argc, char* argv[])
   gvl->getMap("myObjectVoxelmap4")->clearMap();
   gvl->getMap("myObjectVoxelmap5")->clearMap();
   gvl->getMap("myObjectVoxelmap6")->clearMap();
+  gvl->getMap("robotList")->clearMap();
   clock_o_begin_1 = clock();
   mpc.transformSelfSubCloud(0, &trans);
   mpc.transformSelfSubCloud(1, &trans);
@@ -167,6 +173,7 @@ int main(int argc, char* argv[])
   // mpc5.transformSelf(&trans);
   clock_o_begin_2 = clock();
   gvl->getMap("myObjectVoxelmap6")->insertMetaPointCloud(mpc, eBVM_SWEPT_VOLUME_START);
+  gvl->getMap("robotList")->insertMetaPointCloud(mpc, eBVM_SWEPT_VOLUME_START);
   // gvl->getMap("myObjectVoxelmap6")->insertMetaPointCloud(mpc1, eBVM_SWEPT_VOLUME_START);
   // gvl->getMap("myObjectVoxelmap6")->insertMetaPointCloud(mpc2, eBVM_SWEPT_VOLUME_START);
   // gvl->getMap("myObjectVoxelmap6")->insertMetaPointCloud(mpc3, eBVM_SWEPT_VOLUME_START);
@@ -212,7 +219,7 @@ int main(int argc, char* argv[])
 
   while(true)
   {
-    gvl->visualizeMap("myObjectVoxelmap6");
+    gvl->visualizeMap("robotList");
     // gvl->visualizeMap("myObjectVoxelmap1");
     // gvl->visualizeMap("myObjectVoxelmap2");
     // gvl->visualizeMap("myObjectVoxelmap3");
