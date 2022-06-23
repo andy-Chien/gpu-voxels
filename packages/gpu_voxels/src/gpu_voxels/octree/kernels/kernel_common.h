@@ -31,7 +31,7 @@
 #include <gpu_voxels/voxel/BitVoxel.h>
 #include <gpu_voxels/voxel/ProbabilisticVoxel.h>
 
-#if CUDA_VERSION < 9000
+#if __CUDACC_VER_MAJOR__ < 9
 #define CUB_NS_PREFIX namespace thrust { namespace system { namespace cuda { namespace detail {
 #define CUB_NS_POSTFIX                  }                  }                }                  }
 #define cub cub_
@@ -40,13 +40,15 @@
 #undef CUB_NS_PREFIX
 #undef CUB_NS_POSTFIX
 namespace cub = thrust::system::cuda::detail::cub_;
-#else // Cuda 9 or higher
+#elif __CUDACC_VER_MAJOR__ < 11
 #define THRUST_CUB_NS_PREFIX namespace thrust {   namespace cuda_cub {
 #define THRUST_CUB_NS_POSTFIX }  }
 #include <thrust/system/cuda/detail/cub/util_type.cuh>
 #undef CUB_NS_PREFIX
 #undef CUB_NS_POSTFIX
 namespace cub = thrust::cuda_cub::cub;
+#else
+#include <cub/util_type.cuh>
 #endif
 
 // __ballot has been replaced by __ballot_sync in Cuda9

@@ -12,18 +12,35 @@
  */
 //----------------------------------------------------------------------/*
 
+// #define CUB_STDERR
+// #if __CUDACC_VER_MAJOR__ < 9
+// #include <thrust/system/cuda/detail/cub.h>
+// namespace cub = thrust::system::cuda::detail::cub_;
+// #else // Cuda 9 or higher
+// #define THRUST_CUB_NS_PREFIX namespace thrust {   namespace cuda_cub {
+// #define THRUST_CUB_NS_POSTFIX }   }
+// #include <thrust/system/cuda/detail/cub/device/device_radix_sort.cuh>
+// #undef CUB_NS_PREFIX
+// #undef CUB_NS_POSTFIX
+// namespace cub = thrust::cuda_cub::cub;
+// #endif
+
 #define CUB_STDERR
 #if __CUDACC_VER_MAJOR__ < 9
 #include <thrust/system/cuda/detail/cub.h>
 namespace cub = thrust::system::cuda::detail::cub_;
-#else // Cuda 9 or higher
+#elif __CUDACC_VER_MAJOR__ < 11
 #define THRUST_CUB_NS_PREFIX namespace thrust {   namespace cuda_cub {
 #define THRUST_CUB_NS_POSTFIX }   }
+// #if __CUDACC_VER_MAJOR__ < 11
 #include <thrust/system/cuda/detail/cub/device/device_radix_sort.cuh>
 #undef CUB_NS_PREFIX
 #undef CUB_NS_POSTFIX
 namespace cub = thrust::cuda_cub::cub;
+#else
+#include <cub/device/device_radix_sort.cuh>
 #endif
+// #endif
 
 #include <thrust/sort.h>
 #include <thrust/unique.h>

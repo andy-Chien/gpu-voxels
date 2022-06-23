@@ -13,6 +13,12 @@ FIND_PACKAGE(icl_core REQUIRED )
 FIND_PACKAGE(gpu_voxels REQUIRED)
 FIND_PACKAGE(Boost COMPONENTS system REQUIRED)
 
+# Dependencies for ROS interconnect
+FIND_PACKAGE(ROS)
+
+# Dependencies for URDF loading (also requires ROS for kdl/frames.hpp)
+FIND_PACKAGE(urdfdom)
+
 # This is a quirk and should be removed in upcoming versions
 # If you built GPU Voxels without ROS support, remove this.
 FIND_PACKAGE(orocos_kdl REQUIRED)

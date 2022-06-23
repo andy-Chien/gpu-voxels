@@ -36,6 +36,9 @@
 
 #include <thrust/device_vector.h>
 #include <thrust/device_ptr.h>
+#if __has_include(<thrust/host_vector.h>)
+  #include <thrust/host_vector.h>
+#endif
 
 
 /**

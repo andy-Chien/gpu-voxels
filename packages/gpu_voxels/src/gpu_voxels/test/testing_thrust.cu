@@ -26,6 +26,7 @@
 #include <thrust/generate.h>
 #include <thrust/device_vector.h>
 #include <thrust/execution_policy.h>
+#include <thrust/host_vector.h>
 #include <boost/test/unit_test.hpp>
 #include <gpu_voxels/test/testing_fixtures.hpp>
 #include "icl_core_performance_monitor/PerformanceMonitor.h"

@@ -32,7 +32,8 @@
 
 //including cub.h will place all of cub in "thrust::system::cuda::detail::cub_"
 //we don't want to include all of cub here, because gcc will get confused by device code
-#if CUDA_VERSION < 9000
+//
+#if (defined(__CUDACC_VER_MAJOR__) && (__CUDACC_VER_MAJOR__ < 9)) || (defined(CUDA_VERSION) && (CUDA_VERSION < 9000))
 #define CUB_NS_PREFIX namespace thrust { namespace system { namespace cuda { namespace detail {
 #define CUB_NS_POSTFIX                  }                  }                }                  }
 #define cub cub_
@@ -41,7 +42,18 @@
 #undef CUB_NS_PREFIX
 #undef CUB_NS_POSTFIX
 namespace cub = thrust::system::cuda::detail::cub_;
-#else // Cuda 9 or higher
+#elif (defined(__CUDACC_VER_MAJOR__) && (__CUDACC_VER_MAJOR__ < 11)) || (defined(CUDA_VERSION) && (CUDA_VERSION < 11000))
+#define THRUST_CUB_NS_PREFIX namespace thrust {   namespace cuda_cub {
+#define THRUST_CUB_NS_POSTFIX }  }
+#include <thrust/system/cuda/detail/cub/util_type.cuh>
+#undef CUB_NS_PREFIX
+#undef CUB_NS_POSTFIX
+namespace cub = thrust::cuda_cub::cub;
+#elif defined(__CUDACC_VER_MAJOR__) || defined(CUDA_VERSION)
+#include <cub/util_type.cuh>
+#elif __has_include(<cub/util_type.cuh>) // __CUDACC_VER_MAJOR__ dosen't work, we don't know why
+#include <cub/util_type.cuh>
+#elif __has_include(<thrust/system/cuda/detail/cub/util_type.cuh>)
 #define THRUST_CUB_NS_PREFIX namespace thrust {   namespace cuda_cub {
 #define THRUST_CUB_NS_POSTFIX }  }
 #include <thrust/system/cuda/detail/cub/util_type.cuh>

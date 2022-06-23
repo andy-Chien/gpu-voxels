@@ -42,6 +42,9 @@
 #include <thrust/tuple.h>
 #include <thrust/transform.h>
 #include <thrust/device_malloc_allocator.h>
+#if __has_include(<thrust/host_vector.h>)
+  #include <thrust/host_vector.h>
+#endif
 
 #include <gpu_voxels/logging/logging_gpu_voxels.h>
 
